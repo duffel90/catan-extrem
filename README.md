@@ -14,4 +14,4 @@ Middle Mouse remove
 
 ### View
 
-<img src="https://github.com/duffel90/catan-extrem/blob/master/example/view1.PNG" alt="logo" width="200">
+<img src="https://github.com/duffel90/catan-extrem/blob/master/example/view1.PNG" alt="logo" width="800">
