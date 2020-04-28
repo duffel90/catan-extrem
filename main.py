@@ -81,6 +81,8 @@ class cube:
         self.rect = pg.Rect(self.x , self.y , self.size ,self.size)
         self.counter = 10
         self.counter_act = 10
+        self.dx = 0
+        self.dy = 0
 #        self.rect = pg.Rect(x-hex_radius*0.15, y-hex_radius*0.15, hex_radius*0.3, hex_radius*0.3)
 
             
@@ -88,7 +90,8 @@ class cube:
         if event.type == pg.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.
             if self.rect.collidepoint(event.pos):
-                self.counter = 0
+                for cubes in input_cubes:
+                    cubes.counter = 0
             
 
     def draw(self, screen,input_cubes):
@@ -108,7 +111,9 @@ class cube:
                 if nr == 6 :
                     cubes.image = cube6
                 self.counter = self.counter+1
-        screen.blit(self.image,(self.x,self.y))
+                self.dx = np.random.randint(-20,20)
+                self.dy = np.random.randint(-20,20)
+        screen.blit(self.image,(self.x+self.dx,self.y+self.dy))
             
 
 def init_cube():
@@ -116,7 +121,7 @@ def init_cube():
     cubes = []
 
     cubes.append(cube(1650,880,cube1))
-    cubes.append(cube(1750,915,cube1))
+    cubes.append(cube(1750,880,cube1))
     return cubes
 
 
@@ -148,6 +153,8 @@ class city:
         self.status = 'None' # 'city','village'
         self.img_city = img_city
         self.img_village = img_village
+        self.img = []
+        self.size_ = []
         
     def handle_event(self, event,input_boxes):
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -158,19 +165,17 @@ class city:
                         self.color = box.color_fill
                 if event.button ==3:
                     self.status = 'city'
+                    self.img,self.size_ =  convert_img(self.img_city,self.radius*0.6,self.radius*0.6, self.color)
                 if event.button ==1:
                     self.status = 'village'
+                    self.img,self.size_ =  convert_img(self.img_village,self.radius*0.6,self.radius*0.6, self.color)
                 if event.button ==2:
                     # Toggle the active variable.
                     self.status = 'None'
                     
     def draw(self, screen):
-        if self.status == 'city':
-            img,size_ =  convert_img(self.img_city,self.radius*0.6,self.radius*0.6, self.color)
-            screen.blit(img,(self.x-size_[0]/2,self.y-size_[1]/2))
-        if self.status == 'village':
-            img,size_ =  convert_img(self.img_village,self.radius*0.6,self.radius*0.6, self.color)
-            screen.blit(img,(self.x-size_[0]/2,self.y-size_[1]/2))
+        if self.status != 'None':
+            screen.blit(self.img,(self.x-self.size_[0]/2,self.y-self.size_[1]/2))
 
 class street:
     def __init__(self,x,y,rot,hex_radius,image):
@@ -200,13 +205,13 @@ class street:
                     self.status = 'street'
                 if event.button ==3:
                     self.status = 'boat'
+                    self.img,self.size_ =  convert_img(self.image,self.radius*0.6,self.radius*0.6, self.color )
                 if event.button ==2:
                     # Toggle the active variable.
                     self.status = 'None'
     def draw(self, screen):
         if self.status == 'boat':
-            img,size_ =  convert_img(self.image,self.radius*0.6,self.radius*0.6, self.color )
-            screen.blit(img,(self.x-size_[0]/2,self.y-size_[1]/2))
+            screen.blit(self.img,(self.x-self.size_[0]/2,self.y-self.size_[1]/2))
         if self.status == 'street':
             pg.draw.line(screen, (0,0,0), (self.x1,self.y1), (self.x2,self.y2), self.w+6)
             pg.draw.line(screen, self.color, (self.x1,self.y1), (self.x2,self.y2), self.w+2)
