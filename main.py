@@ -83,6 +83,7 @@ class cube:
         self.counter_act = 10
         self.dx = 0
         self.dy = 0
+        self.rotate = 0
 #        self.rect = pg.Rect(x-hex_radius*0.15, y-hex_radius*0.15, hex_radius*0.3, hex_radius*0.3)
 
             
@@ -112,7 +113,10 @@ class cube:
                     cubes.image = cube6
                 self.counter = self.counter+1
                 self.dx = np.random.randint(-20,20)
-                self.dy = np.random.randint(-20,20)
+                self.dy = np.random.randint(-30,30)
+                self.rotate = np.random.randint(0,90)
+                self.image = pg.transform.rotate(self.image,self.rotate)
+                self.rect =  pg.Rect(self.x+self.dx,self.y+self.dy , int(self.size*1.2) ,int(self.size*1.2))
         screen.blit(self.image,(self.x+self.dx,self.y+self.dy))
             
 
