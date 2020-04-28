@@ -40,45 +40,60 @@ boat = pg.image.load('fig/boat.png')
 img_city = pg.image.load('fig/city.png')
 img_village = pg.image.load('fig/village.png')
 
-cube1 = pg.image.load('fig/cube1.png')
-cube2 = pg.image.load('fig/cube2.png')
-cube3 = pg.image.load('fig/cube3.png')
-cube4 = pg.image.load('fig/cube4.png')
-cube5 = pg.image.load('fig/cube5.png')
-cube6 = pg.image.load('fig/cube6.png')
 
-
+cubesize = 45
+cube1 = loadImage('fig/cube1.png',cubesize,cubesize, colorkey=None)
+cube2 = loadImage('fig/cube2.png',cubesize,cubesize, colorkey=None)
+cube3 = loadImage('fig/cube3.png',cubesize,cubesize, colorkey=None)
+cube4 = loadImage('fig/cube4.png',cubesize,cubesize, colorkey=None)
+cube5 = loadImage('fig/cube5.png',cubesize,cubesize, colorkey=None)
+cube6 = loadImage('fig/cube6.png',cubesize,cubesize, colorkey=None)
 
 
 class cube:
     def __init__(self,x,y,image):
         self.x = x
         self.y = y
+        self.size = cubesize
         self.image = image
-        self.radius = []
+        self.rect = pg.Rect(self.x , self.y , self.size ,self.size)
+        self.counter = 5
+        self.counter_act = 5
+#        self.rect = pg.Rect(x-hex_radius*0.15, y-hex_radius*0.15, hex_radius*0.3, hex_radius*0.3)
 
-    def diec():
-        nr = np.random.randint(0,6)
-        if nr == 1 :
-            self.image = cube1
-        if nr == 2 :
-            self.image = cube2
-        if nr == 3 :
-            self.image = cube3
-        if nr == 4 :
-            self.image = cube4
-        if nr == 5 :
-            self.image = cube5
-        if nr == 6 :
-            self.image = cube6
+            
+    def handle_event(self, event,input_cubes):
+        if event.type == pg.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos):
+                self.counter = 0
+            
 
-    def draw(self, screen):
-            screen.blit(self.image,(self.x,self.y))
+    def draw(self, screen,input_cubes):
+        for cubes in input_cubes:
+            nr = np.random.randint(0,6)
+            if self.counter <= 15:
+                if nr == 1 :
+                    cubes.image = cube1
+                if nr == 2 :
+                    cubes.image = cube2
+                if nr == 3 :
+                    cubes.image = cube3
+                if nr == 4 :
+                    cubes.image = cube4
+                if nr == 5 :
+                    cubes.image = cube5
+                if nr == 6 :
+                    cubes.image = cube6
+                self.counter = self.counter+1
+        screen.blit(self.image,(self.x,self.y))
+            
 
 def init_cube():
     cubes = []
+
     cubes.append(cube(1700,900,cube1))
-    cubes.append(cube(1750,910,cube1))
+    cubes.append(cube(1750,915,cube1))
     return cubes
 
 
@@ -102,7 +117,7 @@ class bandit:
 
 class city:
     def __init__(self,x,y,hex_radius,img_city,img_village):
-        self.rect = self.rect = pg.Rect(x-hex_radius*0.15, y-hex_radius*0.15, hex_radius*0.3, hex_radius*0.3)
+        self.rect = pg.Rect(x-hex_radius*0.15, y-hex_radius*0.15, hex_radius*0.3, hex_radius*0.3)
         self.x = x
         self.y = y
         self.radius = hex_radius
@@ -707,7 +722,7 @@ def main():
     input_citys = init_city()
     input_bandit = init_bandit()
     input_port= init_port(input_terrains)
-#    input_cubes = init_cube()
+    input_cubes = init_cube()
     done = False
 
     while not done:
@@ -723,6 +738,8 @@ def main():
                 street_i.handle_event(event,input_boxes)
             for city_i in input_citys :
                 city_i.handle_event(event,input_boxes)
+            for cube_i in input_cubes :
+                cube_i.handle_event(event,input_cubes)
 
         #for box in input_boxes:
             #box.update()
@@ -739,8 +756,8 @@ def main():
             bandit_i.draw(screen)
         for port_i in input_port:
             port_i.draw(screen)
-#        for cube_i in input_cubes:
-#            cube_i.draw(screen)            
+        for cube_i in input_cubes:
+            cube_i.draw(screen,input_cubes)            
         
         
         pg.display.flip()
