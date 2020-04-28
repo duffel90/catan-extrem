@@ -41,13 +41,35 @@ img_city = pg.image.load('fig/city.png')
 img_village = pg.image.load('fig/village.png')
 
 
-cubesize = 45
+def loadImage(filename,img_w,img_h, colorkey=None):
+    img_w = int(img_w)
+    img_h = int(img_h)
+    # Pygame das Bild laden lassen.
+    image = pg.image.load(filename)
+    # Das Pixelformat der Surface an den Bildschirm (genauer: die screen-Surface) anpassen.
+    # Dabei die passende Funktion verwenden, je nach dem, ob wir ein Bild mit Alpha-Kanal haben oder nicht.
+    if image.get_alpha() is None:
+        image = image.convert()
+    else:
+        image = image.convert_alpha()
+    # Colorkey des Bildes setzen, falls nicht None.
+    # Bei -1 den Pixel im Bild an Position (0, 0) als Colorkey verwenden.
+    if colorkey is not None:
+        if colorkey is -1:
+            colorkey = image.get_at((0,0))
+        image.set_colorkey(colorkey, pg.RLEACCEL)
+    image = pg.transform.scale(image,(int(img_w*0.97),int(img_h*0.97)))
+    return image
+
+
+cubesize = 80
 cube1 = loadImage('fig/cube1.png',cubesize,cubesize, colorkey=None)
 cube2 = loadImage('fig/cube2.png',cubesize,cubesize, colorkey=None)
 cube3 = loadImage('fig/cube3.png',cubesize,cubesize, colorkey=None)
 cube4 = loadImage('fig/cube4.png',cubesize,cubesize, colorkey=None)
 cube5 = loadImage('fig/cube5.png',cubesize,cubesize, colorkey=None)
 cube6 = loadImage('fig/cube6.png',cubesize,cubesize, colorkey=None)
+
 
 
 class cube:
@@ -57,8 +79,8 @@ class cube:
         self.size = cubesize
         self.image = image
         self.rect = pg.Rect(self.x , self.y , self.size ,self.size)
-        self.counter = 5
-        self.counter_act = 5
+        self.counter = 10
+        self.counter_act = 10
 #        self.rect = pg.Rect(x-hex_radius*0.15, y-hex_radius*0.15, hex_radius*0.3, hex_radius*0.3)
 
             
@@ -71,7 +93,7 @@ class cube:
 
     def draw(self, screen,input_cubes):
         for cubes in input_cubes:
-            nr = np.random.randint(0,6)
+            nr = np.random.randint(0,7)
             if self.counter <= 15:
                 if nr == 1 :
                     cubes.image = cube1
@@ -90,9 +112,10 @@ class cube:
             
 
 def init_cube():
+
     cubes = []
 
-    cubes.append(cube(1700,900,cube1))
+    cubes.append(cube(1650,880,cube1))
     cubes.append(cube(1750,915,cube1))
     return cubes
 
@@ -518,25 +541,7 @@ def init_city():
         input_citys.append(input_city)
     return input_citys
      
-def loadImage(filename,img_w,img_h, colorkey=None):
-    img_w = int(img_w)
-    img_h = int(img_h)
-    # Pygame das Bild laden lassen.
-    image = pg.image.load(filename)
-    # Das Pixelformat der Surface an den Bildschirm (genauer: die screen-Surface) anpassen.
-    # Dabei die passende Funktion verwenden, je nach dem, ob wir ein Bild mit Alpha-Kanal haben oder nicht.
-    if image.get_alpha() is None:
-        image = image.convert()
-    else:
-        image = image.convert_alpha()
-    # Colorkey des Bildes setzen, falls nicht None.
-    # Bei -1 den Pixel im Bild an Position (0, 0) als Colorkey verwenden.
-    if colorkey is not None:
-        if colorkey is -1:
-            colorkey = image.get_at((0,0))
-        image.set_colorkey(colorkey, pg.RLEACCEL)
-    image = pg.transform.scale(image,(int(img_w*0.97),int(img_h*0.97)))
-    return image
+
 
 def convert_img(image,img_w,img_h ,color,colorkey=(255,255,255)):
     img_w = int(img_w)
