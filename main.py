@@ -1,3 +1,4 @@
+import os
 import pygame as pg
 from matplotlib import cm, colors
 import numpy as np
@@ -5,13 +6,17 @@ from collections import OrderedDict
 from sklearn.utils import shuffle
 import random
 import time
+from win32api import GetSystemMetrics
 
 pg.init()
-screen = pg.display.set_mode((1920, 1080))
+# Set fullscreen
+os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
+screen = pg.display.set_mode((GetSystemMetrics(0), GetSystemMetrics(1)))
+screen_per = GetSystemMetrics(0)/1920
 COLOR_INACTIVE = pg.Color('gray')
 COLOR_ACTIVE = pg.Color('red')
 FONT = pg.font.Font(None, 32)
-pg.display.set_caption("Siedler EXTREME")
+# pg.display.set_caption("Siedler EXTREME")
 players  = 12
 fild_size_x = 14
 # Load Images
@@ -39,7 +44,7 @@ img_bandit = pg.image.load('fig/bandit.png')
 boat = pg.image.load('fig/boat.png')
 img_city = pg.image.load('fig/city.png')
 img_village = pg.image.load('fig/village.png')
-
+img_crown = pg.image.load('fig/crown.png')
 
 def loadImage(filename,img_w,img_h, colorkey=None):
     img_w = int(img_w)
@@ -62,7 +67,7 @@ def loadImage(filename,img_w,img_h, colorkey=None):
     return image
 
 
-cubesize = 80
+cubesize = int(80*screen_per)
 cube1 = loadImage('fig/cube1.png',cubesize,cubesize, colorkey=None)
 cube2 = loadImage('fig/cube2.png',cubesize,cubesize, colorkey=None)
 cube3 = loadImage('fig/cube3.png',cubesize,cubesize, colorkey=None)
@@ -124,8 +129,8 @@ def init_cube():
 
     cubes = []
 
-    cubes.append(cube(1650,880,cube1))
-    cubes.append(cube(1750,880,cube1))
+    cubes.append(cube(int(GetSystemMetrics(0)*0.85),int(GetSystemMetrics(1)*0.8),cube1))
+    cubes.append(cube(int(GetSystemMetrics(0)*0.91),int(GetSystemMetrics(1)*0.8),cube1))
     return cubes
 
 
@@ -219,7 +224,6 @@ class street:
         if self.status == 'street':
             pg.draw.line(screen, (0,0,0), (self.x1,self.y1), (self.x2,self.y2), self.w+6)
             pg.draw.line(screen, self.color, (self.x1,self.y1), (self.x2,self.y2), self.w+2)
-#            screen.blit(screen, (self.x,self.y))
 
 def init_port(input_terrains):
     ports = []
@@ -243,7 +247,6 @@ def init_port(input_terrains):
     ports = shuffle(ports)
 
     k = np.linspace(19,36,len(ports))
-    print(k)
     i = 0
     for j in k:
         ports[i].x= input_terrains[int(j)].x
@@ -254,8 +257,6 @@ def init_port(input_terrains):
         i = i+1
         
     return ports
-        
-
             
 class port:
     def __init__(self,x,y,rot,image):
@@ -272,7 +273,6 @@ class port:
     def draw(self, screen):
         img,size_ =  convert_img(self.image,self.radius*0.8,self.radius*0.8, self.color )
         screen.blit(img,(self.x-size_[0]/2,self.y-size_[1]/2))
-#        screen.blit(self.image,self.img_pos)
 
 
 
@@ -292,7 +292,7 @@ class terrain:
         self.image = image
         self.img_unknown = img_unknown
         self.img_pos = (int(self.x-(self.hex_x_distanz/2)*0.97),int(self.y-(self.radius)*0.97))
-        self.text,self.rect_text = text_(self.x,self.y,self.chip_nr)
+        self.text,self.rect_text = text_(self.x-1,self.y,self.chip_nr)
         self.status = False
     
     def handle_event(self, event,bandits):
@@ -322,14 +322,16 @@ class terrain:
         else:
             screen.blit(self.img_unknown,self.img_pos)
         
-class player_status():
+class settings():
     def __init__(self):
-        self.status
-        self.color
+        self.players = 6
+        
 
 class InputBox:
     def __init__(self, x, y, w, h, text):
         self.rect = pg.Rect(x, y, w, h)
+        self.w = w
+        self.h = h
         self.color = COLOR_INACTIVE
         self.COLOR_INACTIVE = COLOR_INACTIVE
         self.COLOR_ACTIVE = COLOR_ACTIVE
@@ -337,7 +339,11 @@ class InputBox:
         self.text = text
         self.txt_surface = FONT.render(text, True, (0,0,0))
         self.active = False
-        
+        self.cities = 0
+        self.villages = 0
+        self.streets = 0
+        self.points = 0
+        self.crown = loadImage('fig/crown.png',30,30, colorkey=None)
 
     def handle_event(self, event,input_boxes):
         if event.type == pg.MOUSEBUTTONDOWN:
@@ -351,6 +357,7 @@ class InputBox:
             self.color = self.COLOR_ACTIVE if self.active else self.COLOR_INACTIVE
         if event.type == pg.KEYDOWN:
             if self.active:
+                # change color with input# not working
                 if event.key == pg.K_RETURN:
                     if self.text[0] == '(' and self.text[-1] == ')':
                         input = self.text[1:-2]
@@ -389,7 +396,12 @@ class InputBox:
         pg.draw.rect(screen, self.color_fill, self.rect)
         pg.draw.rect(screen, self.color, self.rect, 4)
         # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        screen.blit(self.txt_surface, (self.rect.x+20, self.rect.y+10))
+        # Blit Points
+        self.points = self.cities+self.villages*2
+        self.txt_points = FONT.render(str(self.points), True, (255,255,255))
+        screen.blit(self.crown,(self.rect.x,int(self.rect.y-self.h/2-15)))
+        screen.blit(self.txt_points, (self.rect.x+9, self.rect.y-int(self.h/2)-6))
 
 def text_(x,y,num):
     font = pg.font.Font('freesansbold.ttf', 24) 
@@ -412,9 +424,9 @@ def init_players():
     input_boxes = []
     for player in range(0,players):
         if player % 2:
-            input_box = InputBox(1750, 100+70*(player-1)/2, 150,32,'Player '+str(player+1)) #1700
+            input_box = InputBox(int(GetSystemMetrics(0)*0.9), 100+70*(player-1)/2, int(GetSystemMetrics(0)*0.07),32,'Player '+str(player+1)) #1700
         else:
-            input_box = InputBox(1590, 100+70*(player/2), 150, 32,'Player '+str(player+1))
+            input_box = InputBox(int(GetSystemMetrics(0)*0.82), 100+70*(player/2), int(GetSystemMetrics(0)*0.07), 32,'Player '+str(player+1))
         input_box.color_fill = color_[player]
         if input_box.color_fill[0]>210:
             input_box.COLOR_ACTIVE = (0,0,0)
@@ -424,8 +436,8 @@ def init_players():
 
 def hex_mesh():
     #Berechnung der Matrix
-    game_area_x = (20,1590-20)
-    gamge_area_y = (20,1020-20)
+    game_area_x = (20,int(GetSystemMetrics(0)*0.8))
+    gamge_area_y = (20,GetSystemMetrics(1)-20)
     hex_x_distanz = int((game_area_x[1]-game_area_x[0])/(fild_size_x))
     hex_radius = hex_x_distanz/2/((3/4)**(1/2))
     hex_x_init = np.array(range(game_area_x[0]+hex_x_distanz,game_area_x[1]-hex_x_distanz,hex_x_distanz))
@@ -594,8 +606,8 @@ def init_nr():
     id_list[39:-1] = shuffle(id_list[39:-1])
     id_list[39:-1] = shuffle(id_list[39:-1])
     nr_start = np.array([0,2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12])
-#    nr_start = shuffle(nr_start)
-#    nr_start = shuffle(nr_start)
+    nr_start = shuffle(nr_start)
+    nr_start = shuffle(nr_start)
     nr_start = np.append(nr_start,np.ones(18)*0)
     
     
@@ -726,20 +738,57 @@ def init_bandit():
     list_bandits.append(bandit_)
     return list_bandits
 
-def main():
-    screen.fill((0, 0, 0))
-    screen.blit(backround,(0, 0))
+class start():
+    def __init__(self):
+        self.x = int(GetSystemMetrics(0)*0.5)
+        self.y = int(GetSystemMetrics(1)*0.8)
+        self.dx = 200
+        self.dx2 =int(self.dx/2)
+        self.dy = 20
+        self.dy2 =int(self.dy/2)
+        self.per = 0
+        self.rect_100 = pg.Rect(self.x-self.dx2,self.y-self.dy2, self.dx,self.dy)
+        self.rect_act = pg.Rect(self.x-self.dx2,self.y-self.dy2, self.dx,0)
+        self.color_fill = (0,255,0)
+        self.color = (0,0,0)
+
+
+    
+    def draw(self,screen,per):
+        screen.fill((0, 0, 0))
+        screen.blit(backround,(0, 0))
+        
+        self.rect_act = pg.Rect(self.x-self.dx2,self.y-self.dy2, self.dx/100*per,self.dy)
+        pg.draw.rect(screen, self.color_fill, self.rect_act)
+        pg.draw.rect(screen, self.color, self.rect_100,4)
+        pg.display.flip()
+        time.sleep(0.1)
+  
+
+def new_game():
+    
+    ## new game
+    start_ = start()
+    start_.draw(screen,10)
     clock = pg.time.Clock()
     input_boxes = init_players()
+    start_.draw(screen,20)
     input_terrains = init_terrain()
+    start_.draw(screen,30)
     input_streets = init_street()
+    start_.draw(screen,40)
     input_citys = init_city()
+    start_.draw(screen,50)
     input_bandit = init_bandit()
+    start_.draw(screen,60)
     input_port= init_port(input_terrains)
+    start_.draw(screen,80)
     input_cubes = init_cube()
+    start_.draw(screen,100)
     done = False
 
     while not done:
+        screen.blit(backround,(0, 0))
         screen.blit(backround,(0, 0))
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -776,8 +825,52 @@ def main():
         
         pg.display.flip()
         clock.tick(30)
+   
+#click = False
+#    
+#def main_menu():
+#    clock = pg.time.Clock()
+#    while True:
+# 
+#        screen.fill((0,0,0))
+#        screen.blit(backround,(0, 0))
+##        draw_text('main menu', font, (255, 255, 255), screen, 20, 20)
+# 
+#        mx, my = pg.mouse.get_pos()
+# 
+#        button_1 = pg.Rect(50, 100, 200, 50)
+#        button_2 = pg.Rect(50, 200, 200, 50)
+#        if button_1.collidepoint((mx, my)):
+#            if click:
+#                new_game()
+#        if button_2.collidepoint((mx, my)):
+#            if click:
+#                options()
+#        pg.draw.rect(screen, (255, 0, 0), button_1)
+#        pg.draw.rect(screen, (255, 0, 0), button_2)
+# 
+#        click = False
+#        for event in pg.event.get():
+#            if event.type == pg.QUIT:
+#                pg.quit()
+#                sys.exit()
+#            if event.type == pg.KEYDOWN:
+#                if event.key == K_ESCAPE:
+#                    pg.quit()
+#                    sys.exit()
+#            if event.type == pg.MOUSEBUTTONDOWN:
+#                if event.button == 1:
+#                    click = True
+# 
+#        pg.display.update()
+#        clock.tick(30)
+        
+
+        
+        
 
 
 if __name__ == '__main__':
-    main()
+#    main_menu()
+    new_game()
     pg.quit()

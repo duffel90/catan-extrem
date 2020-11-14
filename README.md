@@ -1,6 +1,9 @@
 Catan-Extrem
 -------
-Supports Python 3.x
+
+Tested with:
+python 3.7.3
+pygame 1.9.6
 
 
 ### Usage
