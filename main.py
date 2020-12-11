@@ -3,7 +3,6 @@ import pygame as pg
 from matplotlib import cm, colors
 import numpy as np
 from collections import OrderedDict
-from sklearn.utils import shuffle
 import random
 import time
 from win32api import GetSystemMetrics
@@ -600,15 +599,13 @@ def init_nr():
     x,y,hex_radius, hex_x_distanz = hex_mesh()
     
     id_rand_ = random.randrange(int(len(x)*0.4),int(len(x)*0.6))
-    id_list = find_nerest_ids(x,y,id_rand_)
-    id_list[0:18] = shuffle(id_list[0:18])
-    id_list[0:18] = shuffle(id_list[0:18])
-    id_list[39:-1] = shuffle(id_list[39:-1])
-    id_list[39:-1] = shuffle(id_list[39:-1])
-    nr_start = np.array([0,2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12])
-    nr_start = shuffle(nr_start)
-    nr_start = shuffle(nr_start)
+    id_list = list(find_nerest_ids(x,y,id_rand_))
+    id_list[0:18] = random.sample(id_list[0:18],len(id_list[0:18]))
+    id_list[39:-1] = random.sample(id_list[39:-1],len(id_list[39:-1]))
+    nr_start = [0,2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
+    nr_start = random.sample(nr_start,len(nr_start))
     nr_start = np.append(nr_start,np.ones(18)*0)
+    print(type(nr_start))
     
     
     terrain_start = np.array([9, 0,0,0,0 , 2,2,2,2 , 4,4,4 , 6,6,6 , 8,8,8,8 ])
@@ -686,9 +683,7 @@ def init_nr2():
     terrain[round(len(terrain)*0.303):round(len(terrain)*0.413)] = terrain[round(len(terrain)*0.303):round(len(terrain)*0.413)]*5 # sheep
     terrain[round(len(terrain)*0.413):round(len(terrain)*0.5)] = terrain[round(len(terrain)*0.413):round(len(terrain)*0.5)]*6 # brick
     terrain[round(len(terrain)*0.5):] = terrain[round(len(terrain)*0.5):]*7 # wasser
-    terrain = shuffle(terrain)
-    terrain = shuffle(terrain)
-    terrain = shuffle(terrain)
+    terrain = random.shuffle(terrain,len(terrain))
     terrain_start[id_list[39:]]=terrain
     start = []
     start = [1,2,2,2,2,3,3,3,3,4,4,4,5,5,5,5,6,6,6]
