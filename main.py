@@ -2,7 +2,6 @@ import os
 import pygame as pg
 from matplotlib import cm, colors
 import numpy as np
-from collections import OrderedDict
 import random
 import time
 from win32api import GetSystemMetrics
@@ -604,9 +603,7 @@ def init_nr():
     id_list[39:-1] = random.sample(id_list[39:-1],len(id_list[39:-1]))
     nr_start = [0,2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
     nr_start = random.sample(nr_start,len(nr_start))
-    nr_start = np.append(nr_start,np.ones(18)*0)
-    print(type(nr_start))
-    
+    nr_start = np.append(nr_start,np.ones(18)*0)    
     
     terrain_start = np.array([9, 0,0,0,0 , 2,2,2,2 , 4,4,4 , 6,6,6 , 8,8,8,8 ])
     terrain_start = np.append(terrain_start,np.ones(18)*10)
