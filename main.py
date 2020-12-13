@@ -241,8 +241,7 @@ def init_port(input_terrains):
 #    load_image_ = loadImage(sheep_port,hex_x_distanz,hex_radius*2, colorkey=None)
     ports.append(port(100,100,30,sheep_port))
     
-    ports = shuffle(ports)
-    ports = shuffle(ports)
+    ports = random.sample(ports,len(ports))
 
     k = np.linspace(19,36,len(ports))
     i = 0
@@ -654,8 +653,7 @@ def init_nr():
     chip_end = np.append(chip_end,np.ones(ten)*10) 
     chip_end = np.append(chip_end,np.ones(eleven)*11) 
     chip_end = np.append(chip_end,np.ones(twelf)*12) 
-    chip_end = shuffle(chip_end)
-    chip_end = shuffle(chip_end)
+    chip_end = random.sample(list(chip_end),len(chip_end))
     chip_nr = nr_start
     chip_nr = np.append(chip_nr,chip_end)
     chip_nr = np.append(chip_nr,np.ones(len(id_list)-len(chip_nr)))
@@ -680,13 +678,11 @@ def init_nr2():
     terrain[round(len(terrain)*0.303):round(len(terrain)*0.413)] = terrain[round(len(terrain)*0.303):round(len(terrain)*0.413)]*5 # sheep
     terrain[round(len(terrain)*0.413):round(len(terrain)*0.5)] = terrain[round(len(terrain)*0.413):round(len(terrain)*0.5)]*6 # brick
     terrain[round(len(terrain)*0.5):] = terrain[round(len(terrain)*0.5):]*7 # wasser
-    terrain = random.shuffle(terrain,len(terrain))
+    terrain = random.sample(terrain,len(terrain))
     terrain_start[id_list[39:]]=terrain
-    start = []
     start = [1,2,2,2,2,3,3,3,3,4,4,4,5,5,5,5,6,6,6]
-    start=shuffle(start)
-    start=shuffle(start)
-    start=shuffle(start)
+    start= random.sample(start,len(start))
+
     terrain_start[id_list[0:19]] =start
     terrain_start[id_list[19:39]] = np.ones(20)*7
 #    
@@ -695,12 +691,8 @@ def init_nr2():
     terrain_state[0:39] = 1
     
     numstart= [2,12,3,3,4,4,5,5,6,6,8,8,9,9,10,10,10,11,11,0]
-    numstart = shuffle(numstart)
-    numstart = shuffle(numstart)
-    numstart = shuffle(numstart)     
-    
-
-    
+    numstart = random.sample(numstart,len(numstart))    
+        
     numend= np.ones(len(terrain)-18)
     numend[0:round(len(numend)*0.055)] = numend[:round(len(numend)*0.055)]*2 # wood
     numend[round(len(numend)*0.055):round(len(numend)*0.11)] = numend[round(len(numend)*0.055):round(len(numend)*0.11)]*12 # 12
@@ -713,9 +705,7 @@ def init_nr2():
     numend[round(len(numend)*0.77):round(len(numend)*0.88)] = numend[round(len(numend)*0.77):round(len(numend)*0.88)]*10 # 10
     numend[round(len(numend)*0.88):round(len(numend)*1)] = numend[round(len(numend)*0.88):round(len(numend)*1)]*11 # 11
 
-    numend = shuffle(numend)
-    numend = shuffle(numend)
-    numend = shuffle(numend)
+    numend = random.sample(numend,len(numend))
     num = numstart
     num[39:] = numend
     return terrain, num, id_list
